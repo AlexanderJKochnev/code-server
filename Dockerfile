@@ -2,12 +2,29 @@ FROM codercom/code-server:4.96.4
 
 USER root
 
-# Установка JDK 21 (стандарт в Debian 13 Trixie) и базовых утилит
+# Установка JDK 17 (стандарт в Debian 13 Trixie) и базовых утилит
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openjdk-17-jdk-headless \
-    unzip \
-    curl \
+    gradle \
     git \
+    openssh-client \
+    ca-certificates \
+    curl \
+    wget \
+    unzip \
+    zip \
+    tar \
+    xz-utils \
+    zlib1g \
+    libstdc++6 \
+    libgcc-s1 \
+    ripgrep \
+    fd-find \
+    jq \
+    tree \
+    less \
+    procps \
+    qrencode \
     && rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
