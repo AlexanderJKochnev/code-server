@@ -23,7 +23,7 @@ WORKDIR /home/coder
 RUN curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/install.sh | bash
 
 # Предустановка плагинов Kotlin и Java для VS Code
-RUN code-server --install-extension JetBrains.intellij-server
+# RUN code-server --install-extension JetBrains.intellij-server
 
-# RUN code-server --install-extension fwcd.kotlin \
-#     && code-server --install-extension vscjava.vscode-java-pack
+RUN code-server --install-extension fwcd.kotlin \
+    && code-server --install-extension vscjava.vscode-java-pack
