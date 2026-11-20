@@ -1,16 +1,16 @@
-FROM codercom/code-server:latest
+FROM codercom/code-server:4.96.4
 
 USER root
 
 # Установка JDK 21 (стандарт в Debian 13 Trixie) и базовых утилит
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    openjdk-21-jdk-headless \
+    openjdk-17-jdk-headless \
     unzip \
     curl \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV ANDROID_HOME=/home/coder/Android/Sdk
 ENV PATH="${PATH}:/home/coder/.local/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin"
 
