@@ -1,0 +1,32 @@
+<manifest xmlns:android="http://android.com">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:label="PhotoSender"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.Material3.DayNight">
+        <!-- usesCleartextTraffic="true" разрешает отправку на http:// (без SSL), полезно для тестов -->
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.CATEGORY_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Провайдер для сохранения фото во временный файл -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+</manifest>
