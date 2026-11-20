@@ -12,14 +12,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 ENV ANDROID_HOME=/home/coder/Android/Sdk
-ENV PATH="${PATH}:/home/coder/.android/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin"
+ENV PATH="${PATH}:/home/coder/.local/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin"
+
+# ENV PATH="${PATH}:/home/coder/.android/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin"
 
 USER coder
 WORKDIR /home/coder
 
 # Установка официального Android CLI
-RUN curl -fsSL https://google.com | bash
+RUN curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/install.sh | bash
 
 # Предустановка плагинов Kotlin и Java для VS Code
-RUN code-server --install-extension fwcd.kotlin \
-    && code-server --install-extension vscjava.vscode-java-pack
+RUN code-server --install-extension JetBrains.intellij-server
+
+# RUN code-server --install-extension fwcd.kotlin \
+#     && code-server --install-extension vscjava.vscode-java-pack
