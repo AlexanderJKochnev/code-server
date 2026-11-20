@@ -9,7 +9,7 @@ services:
       - PASSWORD=${IDE_PASSWORD}
       - ANDROID_HOME=/home/coder/Android/Sdk
     volumes:
-      - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/projects:/home/coder/projects
+      - ./projects:/home/coder/projects
       - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/gradle-cache:/home/coder/.gradle
       - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/android-sdk:/home/coder/Android/Sdk
       - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/code-config:/home/coder/.local/share/code-server
