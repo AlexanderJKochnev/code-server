@@ -30,9 +30,6 @@ services:
     volumes:
       - ${BIND_VOLUMES}/${PROJECT_NAME}/emulator-data:/root/.android
     networks:
-      - shared_network
-    
-    networks:
       nginx_gateway_shared_network:
 
 networks:
