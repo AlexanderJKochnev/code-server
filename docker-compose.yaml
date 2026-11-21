@@ -29,6 +29,9 @@ services:
       - WEB_VNC=true
     volumes:
       - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/emulator-data:/root/.android
+    ports:
+      - "5554:5554"
+      - "5555:5555"
     networks:
       nginx_gateway_shared_network:
 
