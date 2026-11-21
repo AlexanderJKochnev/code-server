@@ -28,14 +28,12 @@ services:
     environment:
       - EMULATOR_DEVICE=Samsung Galaxy S10
       - WEB_VNC=true
-      - EMULATOR_ADDITIONAL_ARGS=-gpu swiftshader_indirect -feature -Vulkan -cores 2 -memory 2048
+      - EMULATOR_ADDITIONAL_ARGS=-no-accel -gpu swiftshader_indirect -no-snapshot -cores 2 -memory 2048
     volumes:
-      - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/emulator-data:/root/.android
-    # ports:
-    #   - "5554:5554"
-    #   - "5555:5555"
+      - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/emulator-data:/home/androidusr/.android
     networks:
-      nginx_gateway_shared_network:
+      - shared_network
+
 
 networks:
   nginx_gateway_shared_network:
