@@ -3,3 +3,6 @@
 gradle wrapper --gradle-version 8.10.2
 ## сборка проекта (выполнять в code-server терминале из директории проекта)
 ./gradlew assembleDebug
+
+## После успешного выполнения ./gradlew assembleDebug файл лежит по пути:
+~/projects/PhotoSender/app/build/outputs/apk/debug/app-debug.apk

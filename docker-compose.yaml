@@ -18,19 +18,20 @@ services:
 
   # Опционально: эмулятор Android с доступом через браузер (scrcpy-web)
   android-emulator:
-    image: shmayro/dockerify-android:latest
+    image: budtmo/docker-android:emulator_11.0
     container_name: android-emulator
     restart: unless-stopped
+    privileged: true
     devices:
       - "/dev/kvm:/dev/kvm"
-    # ports:
-    #   - "127.0.0.1:8000:8000" # Веб-интерфейс экрана (scrcpy-web)
-    #   - "127.0.0.1:5555:5555" # ADB порт
     environment:
-      - RAM_SIZE=4096
-      - SCREEN_RESOLUTION=1080x2400
-    profiles:
-      - emulator
+      - EMULATOR_DEVICE=Samsung Galaxy S10
+      - WEB_VNC=true
+    volumes:
+      - ${BIND_VOLUMES}/${PROJECT_NAME}/emulator-data:/root/.android
+    networks:
+      - shared_network
+    
     networks:
       nginx_gateway_shared_network:
 
