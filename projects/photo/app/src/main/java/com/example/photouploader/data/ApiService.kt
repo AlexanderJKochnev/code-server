@@ -1,8 +1,11 @@
 package com.example.photouploader.data
 
-import com.example.photouploader.data.model.*
+import com.example.photouploader.data.model.LoginRequest
+import com.example.photouploader.data.model.LoginResponse
+import com.example.photouploader.data.model.SearchResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.http.*
 
 interface ApiService {
@@ -29,5 +32,5 @@ interface ApiService {
         @Part("id") id: RequestBody?,
         @Part("display_name") displayName: RequestBody,
         @Part("metadata") metadata: RequestBody
-    ): UploadResponse
+    ): ResponseBody
 }

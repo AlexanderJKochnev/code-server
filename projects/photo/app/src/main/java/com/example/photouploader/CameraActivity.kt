@@ -2,8 +2,9 @@ package com.example.photouploader
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
@@ -40,9 +41,15 @@ class CameraActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
+
         previewView = findViewById(R.id.previewView)
         settings = SettingsManager(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        // === Клик по результату — скрыть превью и вернуться к камере ===
+        findViewById<View>(R.id.ivResult).setOnClickListener {
+            it.visibility = View.GONE
+        }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED) {
@@ -51,8 +58,17 @@ class CameraActivity : AppCompatActivity() {
             startCamera()
         }
 
-        findViewById<android.view.View>(R.id.btnCapture).setOnClickListener {
+        findViewById<View>(R.id.btnCapture).setOnClickListener {
             takePhoto()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 10 && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+            startCamera()
         }
     }
 
@@ -88,8 +104,10 @@ class CameraActivity : AppCompatActivity() {
                 }
                 override fun onError(exception: ImageCaptureException) {
                     runOnUiThread {
-                        Toast.makeText(this@CameraActivity,
-                            "Capture failed: ${exception.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@CameraActivity,
+                            "Capture failed: ${exception.message}", Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             })
@@ -111,17 +129,34 @@ class CameraActivity : AppCompatActivity() {
                 val namePart = tagName.toRequestBody("text/plain".toMediaTypeOrNull())
                 val metaPart = metadata.toRequestBody("application/json".toMediaTypeOrNull())
 
-                val response = api.uploadImage(
+                val responseBody = api.uploadImage(
                     settings.uploadUrl, tagName, filePart, idPart, namePart, metaPart
                 )
+                val imageBytes = responseBody.bytes()
+                responseBody.close()
+
+                val bitmap = android.graphics.BitmapFactory
+                    .decodeByteArray(imageBytes, 0, imageBytes.size)
+
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@CameraActivity,
-                        "Uploaded: ${response.toString()}", Toast.LENGTH_LONG).show()
+                    if (bitmap != null) {
+                        findViewById<ImageView>(R.id.ivResult).setImageBitmap(bitmap)
+                        findViewById<View>(R.id.ivResult).visibility = View.VISIBLE
+                    } else {
+                        Toast.makeText(
+                            this@CameraActivity,
+                            "Сервер вернул ${imageBytes.size} байт, но это не изображение",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@CameraActivity,
-                        "Upload error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "Upload error: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
