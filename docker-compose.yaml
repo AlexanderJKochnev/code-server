@@ -30,7 +30,7 @@ services:
       - WEB_VNC=true
       - EMULATOR_ADDITIONAL_ARGS=-gpu swiftshader_indirect -feature -Vulkan -cores 2 -memory 2048
     volumes:
-      - ${BIND_VOLUMES}/${PROJECT_NAME}/emulator-data:/root/.android
+      - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/emulator-data:/root/.android
     # ports:
     #   - "5554:5554"
     #   - "5555:5555"

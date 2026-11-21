@@ -16,14 +16,20 @@ samsung_galaxy_s10_11.0
 emulator -avd samsung_galaxy_s10_11.0 -no-snapshot
 
 
-### удаление блокировок вручную
-    rm -f ~/.android/avd/samsung_galaxy_s10_11.0.avd/*.lock
-    ps aux | grep -E "qemu|emulator"
-    kill -9 <PID>   #  удаление оставшися провессов
+### удаление блокировок вручную и запуск
+rm -f ~/.android/avd/samsung_galaxy_s10_11.0.avd/*.lock
+ps aux | grep -E "qemu|emulator"
+kill -9 <PID>   #  удаление оставшися провессов
+emulator -avd samsung_galaxy_s10_11.0 -no-snapshot -no-audio -gpu swiftshader_indirect
 
-#### запуск заново
-    emulator -avd samsung_galaxy_s10_11.0 -no-snapshot -no-audio -gpu swiftshader_indirect
-    
+### еще вариант того же
+pkill -9 qemu-system 2>/dev/null
+pkill -9 emulator 2>/dev/null
+rm -f ~/.android/avd/samsung_galaxy_s10_11.0.avd/*.lock
+emulator -avd samsung_galaxy_s10_11.0 -no-snapshot -no-audio -gpu swiftshader_indirect -no-metrics
+
+
+
 
 ## соединение с эмулятором
     docker compose exec -it android-ide sh
