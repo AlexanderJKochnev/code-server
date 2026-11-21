@@ -28,7 +28,7 @@ services:
       - EMULATOR_DEVICE=Samsung Galaxy S10
       - WEB_VNC=true
     volumes:
-      - ${BIND_VOLUMES}/${PROJECT_NAME}/emulator-data:/root/.android
+      - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/emulator-data:/root/.android
     networks:
       nginx_gateway_shared_network:
 
