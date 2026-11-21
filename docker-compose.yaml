@@ -32,7 +32,7 @@ services:
     volumes:
       - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/emulator-data:/home/androidusr/.android
     networks:
-      - shared_network
+      - nginx_gateway_shared_network
 
 
 networks:
