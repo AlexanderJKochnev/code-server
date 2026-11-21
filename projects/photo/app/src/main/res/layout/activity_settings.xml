@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/etAuthUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Auth URL" />
+
+        <EditText
+            android:id="@+id/etSearchUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search URL" />
+
+        <EditText
+            android:id="@+id/etUploadUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Upload URL" />
+
+        <EditText
+            android:id="@+id/etUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Username" />
+
+        <EditText
+            android:id="@+id/etPass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/etLimit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Limit"
+            android:inputType="number" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Сохранить и войти" />
+    </LinearLayout>
+</ScrollView>
