@@ -8,19 +8,19 @@ class SettingsManager(context: Context) {
         context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
 
     var authUrl: String
-        get() = prefs.getString("auth_url", "https://api.test.abc8888.ru/api/login") ?: ""
+        get() = prefs.getString("auth_url", "https://api.test.abc8888.ru/auth/say_bay") ?: ""
         set(v) = prefs.edit().putString("auth_url", v).apply()
 
     var searchUrl: String
-        get() = prefs.getString("search_url", "https://api.test.abc8888.ru/api/search_all") ?: ""
+        get() = prefs.getString("search_url", "https://api.test.abc8888.ru/items/search_display_name_all") ?: ""
         set(v) = prefs.edit().putString("search_url", v).apply()
 
     var uploadUrl: String
-        get() = prefs.getString("upload_url", "https://api.test.abc8888.ru/api/upload_image") ?: ""
+        get() = prefs.getString("upload_url", "https://api.test.abc8888.ru/items/upload_image") ?: ""
         set(v) = prefs.edit().putString("upload_url", v).apply()
 
     var username: String
-        get() = prefs.getString("username", "") ?: ""
+        get() = prefs.getString("username", "photo") ?: ""
         set(v) = prefs.edit().putString("username", v).apply()
 
     var password: String
