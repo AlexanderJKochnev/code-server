@@ -34,7 +34,6 @@ services:
     networks:
       - nginx_gateway_shared_network
 
-
 networks:
   nginx_gateway_shared_network:
     driver: bridge
