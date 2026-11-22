@@ -33,4 +33,15 @@ interface ApiService {
         @Part("display_name") displayName: RequestBody,
         @Part("metadata") metadata: RequestBody
     ): ResponseBody
+
+    @Multipart
+    @POST
+    suspend fun saveImage(
+        @Url url: String,
+        @Query("tag") tag: String,
+        @Part file: MultipartBody.Part,
+        @Part("id") id: RequestBody?,
+        @Part("display_name") displayName: RequestBody,
+        @Part("metadata") metadata: RequestBody
+    ): ResponseBody
 }

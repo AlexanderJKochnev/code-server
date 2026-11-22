@@ -28,6 +28,12 @@
             android:hint="Upload URL" />
 
         <EditText
+            android:id="@+id/etSaveUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Save URL" />
+
+        <EditText
             android:id="@+id/etUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

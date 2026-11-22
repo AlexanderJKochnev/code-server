@@ -19,6 +19,10 @@ class SettingsManager(context: Context) {
         get() = prefs.getString("upload_url", "https://api.test.abc8888.ru/items/upload_image") ?: ""
         set(v) = prefs.edit().putString("upload_url", v).apply()
 
+    var saveUrl: String
+        get() = prefs.getString("save_url", "https://api.test.abc8888.ru/items/save_image") ?: ""
+        set(v) = prefs.edit().putString("save_url", v).apply()
+
     var username: String
         get() = prefs.getString("username", "photo") ?: ""
         set(v) = prefs.edit().putString("username", v).apply()
@@ -34,4 +38,5 @@ class SettingsManager(context: Context) {
     var limit: Int
         get() = prefs.getInt("limit", 5)
         set(v) = prefs.edit().putInt("limit", v).apply()
+
 }

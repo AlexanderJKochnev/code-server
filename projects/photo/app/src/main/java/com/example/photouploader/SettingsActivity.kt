@@ -22,6 +22,7 @@ class SettingsActivity : AppCompatActivity() {
         val etAuthUrl = findViewById<EditText>(R.id.etAuthUrl)
         val etSearchUrl = findViewById<EditText>(R.id.etSearchUrl)
         val etUploadUrl = findViewById<EditText>(R.id.etUploadUrl)
+        val etSaveUrl = findViewById<EditText>(R.id.etSaveUrl)
         val etUser = findViewById<EditText>(R.id.etUser)
         val etPass = findViewById<EditText>(R.id.etPass)
         val etLimit = findViewById<EditText>(R.id.etLimit)
@@ -29,6 +30,7 @@ class SettingsActivity : AppCompatActivity() {
         etAuthUrl.setText(settings.authUrl)
         etSearchUrl.setText(settings.searchUrl)
         etUploadUrl.setText(settings.uploadUrl)
+        etSaveUrl.setText(settings.saveUrl)
         etUser.setText(settings.username)
         etPass.setText(settings.password)
         etLimit.setText(settings.limit.toString())
@@ -37,6 +39,7 @@ class SettingsActivity : AppCompatActivity() {
             settings.authUrl = etAuthUrl.text.toString()
             settings.searchUrl = etSearchUrl.text.toString()
             settings.uploadUrl = etUploadUrl.text.toString()
+            settings.saveUrl = etSaveUrl.text.toString()
             settings.username = etUser.text.toString()
             settings.password = etPass.text.toString()
             settings.limit = etLimit.text.toString().toIntOrNull() ?: 5
