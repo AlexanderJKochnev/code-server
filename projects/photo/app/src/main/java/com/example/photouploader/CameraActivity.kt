@@ -49,10 +49,10 @@ class CameraActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         // === Клик по результату — скрыть превью и вернуться к камере ===
-        findViewById<View>(R.id.ivResult).setOnClickListener {
-            it.visibility = View.GONE
-            startCamera()
-        }
+        // findViewById<View>(R.id.ivResult).setOnClickListener {
+        //    it.visibility = View.GONE
+        //    startCamera()
+        // }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED) {
