@@ -38,6 +38,8 @@ class CameraActivity : AppCompatActivity() {
     private val tagId: Int? by lazy { intent.getIntExtra("id", -1).takeIf { it >= 0 } }
     private val tagName: String by lazy { intent.getStringExtra("display_name") ?: "" }
 
+    private var cameraProvider: ProcessCameraProvider? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
@@ -49,6 +51,7 @@ class CameraActivity : AppCompatActivity() {
         // === Клик по результату — скрыть превью и вернуться к камере ===
         findViewById<View>(R.id.ivResult).setOnClickListener {
             it.visibility = View.GONE
+            startCamera()
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -76,6 +79,7 @@ class CameraActivity : AppCompatActivity() {
         val future = ProcessCameraProvider.getInstance(this)
         future.addListener({
             val provider = future.get()
+            cameraProvider = provider
             val preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
@@ -140,6 +144,8 @@ class CameraActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) {
                     if (bitmap != null) {
+                        // Отвязываем камеру — превью становится чёрным/пустым
+                        cameraProvider?.unbindAll()
                         findViewById<ImageView>(R.id.ivResult).setImageBitmap(bitmap)
                         findViewById<View>(R.id.ivResult).visibility = View.VISIBLE
                     } else {
