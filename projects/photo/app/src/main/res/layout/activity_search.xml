@@ -5,17 +5,24 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <AutoCompleteTextView
-        android:id="@+id/autoComplete"
+    <EditText
+        android:id="@+id/etQuery"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Введите название (мин. 4 символа)"
-        android:completionThreshold="1" />
+        android:inputType="text" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvResults"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" />
 
     <Button
         android:id="@+id/btnNext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="Далее → Камера" />
 </LinearLayout>

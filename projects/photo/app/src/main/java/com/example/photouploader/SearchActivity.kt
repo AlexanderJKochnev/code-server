@@ -4,36 +4,55 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.photouploader.data.RetrofitClient
 import com.example.photouploader.data.SettingsManager
 import com.example.photouploader.data.model.SearchResult
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var autoComplete: AutoCompleteTextView
+    private lateinit var etQuery: EditText
+    private lateinit var rvResults: RecyclerView
+    private lateinit var adapter: ResultsAdapter
     private lateinit var settings: SettingsManager
-    private var searchJob: Job? = null
+
     private val queryFlow = MutableStateFlow("")
-    private var results: List<SearchResult> = emptyList()
     private var selected: SearchResult? = null
+    private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         settings = SettingsManager(this)
-        autoComplete = findViewById(R.id.autoComplete)
+        etQuery = findViewById(R.id.etQuery)
+        rvResults = findViewById(R.id.rvResults)
 
-        autoComplete.addTextChangedListener(object : TextWatcher {
+        adapter = ResultsAdapter { item ->
+            selected = item
+            etQuery.setText(item.display_name)
+            etQuery.setSelection(etQuery.text.length)
+        }
+        rvResults.layoutManager = LinearLayoutManager(this)
+        rvResults.adapter = adapter
+
+        etQuery.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val text = s?.toString()?.trim() ?: ""
                 selected = null
@@ -43,25 +62,17 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        autoComplete.setOnItemClickListener { _, _, position, _ ->
-            selected = results.getOrNull(position)
-            autoComplete.setText(selected?.display_name ?: "")
-            autoComplete.dismissDropDown()
-        }
-
-        // Debounce 400ms
+        // Debounce 400 мс, запрос только при длине > 3
         lifecycleScope.launch {
             queryFlow
                 .debounce(400)
                 .filter { it.length > 3 }
-                .collectLatest { query ->
-                    performSearch(query)
-                }
+                .collectLatest { query -> performSearch(query) }
         }
 
-        findViewById<android.view.View>(R.id.btnNext).setOnClickListener {
+        findViewById<Button>(R.id.btnNext).setOnClickListener {
             val displayName = selected?.display_name
-                ?: autoComplete.text.toString().trim()
+                ?: etQuery.text.toString().trim()
             if (displayName.isBlank()) return@setOnClickListener
 
             val intent = Intent(this, CameraActivity::class.java).apply {
@@ -77,19 +88,47 @@ class SearchActivity : AppCompatActivity() {
         searchJob = lifecycleScope.launch {
             try {
                 val api = RetrofitClient.create(settings)
-                val response = withContext(Dispatchers.IO) {
+                val results = withContext(Dispatchers.IO) {
                     api.search(settings.searchUrl, query, settings.limit)
                 }
-                results = response.results
-                val names = results.map { it.display_name }
-                val adapter = ArrayAdapter(
-                    this@SearchActivity,
-                    android.R.layout.simple_dropdown_item_1line,
-                    names
-                )
-                autoComplete.setAdapter(adapter)
-                if (names.isNotEmpty()) autoComplete.showDropDown()
-            } catch (_: Exception) { /* silently ignore, user continues typing */ }
+                adapter.submit(results)
+            } catch (_: Exception) {
+                // молча игнорируем — пользователь продолжает печатать
+            }
+        }
+    }
+
+    // --- Адаптер ---
+    private class ResultsAdapter(
+        val onClick: (SearchResult) -> Unit
+    ) : RecyclerView.Adapter<ResultsAdapter.VH>() {
+
+        private val items = mutableListOf<SearchResult>()
+
+        fun submit(newItems: List<SearchResult>) {
+            items.clear()
+            items.addAll(newItems)
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+            val v = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_search_result, parent, false)
+            return VH(v)
+        }
+
+        override fun onBindViewHolder(holder: VH, position: Int) {
+            val item = items[position]
+            holder.tvName.text = item.display_name
+            holder.tvId.text = "id: ${item.id ?: "—"}"
+            holder.itemView.setOnClickListener { onClick(item) }
+        }
+
+        override fun getItemCount() = items.size
+
+        class VH(view: android.view.View) : RecyclerView.ViewHolder(view) {
+            val tvName: TextView = view.findViewById(R.id.tvName)
+            val tvId: TextView = view.findViewById(R.id.tvId)
         }
     }
 }
