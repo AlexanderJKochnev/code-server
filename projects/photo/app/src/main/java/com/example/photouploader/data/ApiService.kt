@@ -4,7 +4,6 @@ import com.example.photouploader.data.model.LoginRequest
 import com.example.photouploader.data.model.LoginResponse
 import com.example.photouploader.data.model.SearchResult
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.http.*
 
@@ -28,10 +27,8 @@ interface ApiService {
     suspend fun uploadImage(
         @Url url: String,
         @Query("tag") tag: String,
-        @Part file: MultipartBody.Part,
-        @Part("id") id: RequestBody?,
-        @Part("display_name") displayName: RequestBody,
-        @Part("metadata") metadata: RequestBody
+        @Query("id") id: Int?,
+        @Part file: MultipartBody.Part
     ): ResponseBody
 
     @Multipart
@@ -39,9 +36,7 @@ interface ApiService {
     suspend fun saveImage(
         @Url url: String,
         @Query("tag") tag: String,
-        @Part file: MultipartBody.Part,
-        @Part("id") id: RequestBody?,
-        @Part("display_name") displayName: RequestBody,
-        @Part("metadata") metadata: RequestBody
+        @Query("id") id: Int?,
+        @Part file: MultipartBody.Part
     ): ResponseBody
 }
