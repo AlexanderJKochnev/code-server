@@ -42,7 +42,7 @@ class CameraActivity : AppCompatActivity() {
 
     private var cameraProvider: ProcessCameraProvider? = null
     private var lastWebp: ByteArray? = null
-    private var lastImageHash: Int? = null
+    private var lastImageHash: String? = null
 
     private val tagId: Int? by lazy { intent.getIntExtra("id", -1).takeIf { it >= 0 } }
     private val tagName: String by lazy { intent.getStringExtra("display_name") ?: "" }
@@ -151,30 +151,27 @@ class CameraActivity : AppCompatActivity() {
                 )
 
                 val rawHeader = response.headers()["x-image-hash"]
-                val imageHash = rawHeader?.toIntOrNull()
-
-                // --- val imageHash = response.headers()["x-image-hash"]?.toIntOrNull()
                 val imageBytes = response.body()?.bytes()
                     ?: throw IllegalStateException("Empty body")
 
                 response.body()?.close()
 
                 lastWebp = webp
-                lastImageHash = imageHash
+                lastImageHash = rawHeader?.trim()
 
                 // --- диагностика: показать всё, что нужно ---
                 withContext(Dispatchers.Main) {
-    val allHeaders = response.headers().names()
-        .joinToString("\n") { "$it = ${response.headers()[it]}" }
-    Toast.makeText(this@CameraActivity,
-        "bytes=${imageBytes.size}", Toast.LENGTH_LONG).show()
-    Toast.makeText(this@CameraActivity,
-        "rawHeader='$rawHeader'", Toast.LENGTH_LONG).show()
-    Toast.makeText(this@CameraActivity,
-        "parsed=$imageHash, last=$lastImageHash", Toast.LENGTH_LONG).show()
-    Toast.makeText(this@CameraActivity,
-        "headers:\n$allHeaders", Toast.LENGTH_LONG).show()
-}
+                    val allHeaders = response.headers().names()
+                        .joinToString("\n") { "$it = ${response.headers()[it]}" }
+                    Toast.makeText(this@CameraActivity,
+                        "bytes=${imageBytes.size}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@CameraActivity,
+                        "rawHeader='$rawHeader'", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@CameraActivity,
+                        "last=$lastImageHash", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@CameraActivity,
+                        "headers:\n$allHeaders", Toast.LENGTH_LONG).show()
+                }
                 // --- конец диагностики ---
 
 
