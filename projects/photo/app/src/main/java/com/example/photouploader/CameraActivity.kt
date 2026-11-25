@@ -19,7 +19,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.photouploader.data.RetrofitClient
 import com.example.photouploader.data.SettingsManager
-import com.example.photouploader.util.ExifHelper
 import com.example.photouploader.util.ImageCompressor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,9 +39,7 @@ class CameraActivity : AppCompatActivity() {
 
     private var cameraProvider: ProcessCameraProvider? = null
     private var photoFile: File? = null
-
     private var lastWebp: ByteArray? = null
-    private var lastMetadata: String? = null
 
     private val tagId: Int? by lazy { intent.getIntExtra("id", -1).takeIf { it >= 0 } }
     private val tagName: String by lazy { intent.getStringExtra("display_name") ?: "" }
@@ -55,42 +52,19 @@ class CameraActivity : AppCompatActivity() {
         settings = SettingsManager(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        // Клик по результату — скрыть результат, вернуть камеру
+        // Клик по результату — скрыть результат и вернуться к камере
         findViewById<View>(R.id.ivResult).setOnClickListener {
             it.visibility = View.GONE
             findViewById<View>(R.id.llActions).visibility = View.GONE
             startCamera()
         }
 
-        // No — ничего не отправляем, возврат на главное
         findViewById<Button>(R.id.btnNo).setOnClickListener {
-            finish()
+            finish() // возврат на главное окно без сохранения
         }
 
-        // Save — отправляем изображение на save_image
         findViewById<Button>(R.id.btnSave).setOnClickListener {
-            val webp = lastWebp ?: return@setOnClickListener
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    val api = RetrofitClient.create(settings)
-                    val filePart = MultipartBody.Part.createFormData(
-                        "file", "image.webp",
-                        webp.toRequestBody("image/webp".toMediaTypeOrNull())
-                    )
-                    // Новая сигнатура: url, tag, id, file
-                    api.saveImage(settings.saveUrl, tagName, tagId, filePart)
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@CameraActivity, "Сохранено", Toast.LENGTH_SHORT).show()
-                        finish()
-                    }
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            this@CameraActivity, "Save error: ${e.message}", Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            }
+            saveApprovedImage()
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -119,7 +93,6 @@ class CameraActivity : AppCompatActivity() {
         future.addListener({
             val provider = future.get()
             cameraProvider = provider
-
             val preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
@@ -158,57 +131,59 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun uploadPhoto(file: File) {
-    lifecycleScope.launch(Dispatchers.IO) {
-        try {
-            val raw = file.readBytes()
-            val webp = ImageCompressor.compressToWebp(raw)
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val raw = file.readBytes()
+                val webp = ImageCompressor.compressToWebp(raw)
 
-            val api = RetrofitClient.create(settings)
-            val filePart = MultipartBody.Part.createFormData(
-                "file", "image.webp",
-                webp.toRequestBody("image/webp".toMediaTypeOrNull())
-            )
+                val api = RetrofitClient.create(settings)
+                val filePart = MultipartBody.Part.createFormData(
+                    "file", "image.webp",
+                    webp.toRequestBody("image/webp".toMediaTypeOrNull())
+                )
 
-            val responseBody = api.uploadImage(
-                settings.uploadUrl, tagName, tagId, filePart
-            )
-            val imageBytes = responseBody.bytes()
-            responseBody.close()
+                val responseBody = api.uploadImage(
+                    settings.uploadUrl, tagName, tagId, filePart
+                )
+                val imageBytes = responseBody.bytes()
+                responseBody.close()
 
-            lastWebp = webp
+                lastWebp = webp
 
-            val bitmap = android.graphics.BitmapFactory
-                .decodeByteArray(imageBytes, 0, imageBytes.size)
+                val bitmap = android.graphics.BitmapFactory
+                    .decodeByteArray(imageBytes, 0, imageBytes.size)
 
-            withContext(Dispatchers.Main) {
-                if (bitmap != null) {
-                    cameraProvider?.unbindAll()
-                    findViewById<ImageView>(R.id.ivResult).setImageBitmap(bitmap)
-                    findViewById<View>(R.id.ivResult).visibility = View.VISIBLE
-                    findViewById<View>(R.id.llActions).visibility = View.VISIBLE
-                } else {
+                withContext(Dispatchers.Main) {
+                    if (bitmap != null) {
+                        // Отключаем камеру — превью уходит, остаётся серый фон
+                        cameraProvider?.unbindAll()
+                        findViewById<ImageView>(R.id.ivResult).setImageBitmap(bitmap)
+                        findViewById<View>(R.id.ivResult).visibility = View.VISIBLE
+                        findViewById<View>(R.id.llActions).visibility = View.VISIBLE
+                    } else {
+                        Toast.makeText(
+                            this@CameraActivity,
+                            "Сервер вернул ${imageBytes.size} байт, но это не изображение",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
                     Toast.makeText(
                         this@CameraActivity,
-                        "Сервер вернул ${imageBytes.size} байт, но это не изображение",
-                        Toast.LENGTH_LONG
+                        "Upload error: ${e.message}", Toast.LENGTH_LONG
                     ).show()
-                }
-            }
-        } catch (e: Exception) {
-            withContext(Dispatchers.Main) {
-                Toast.makeText(
-                    this@CameraActivity,
-                    "Upload error: ${e.message}", Toast.LENGTH_LONG
-                ).show()
                 }
             }
         }
     }
 
     private fun saveApprovedImage() {
-        val webp = lastWebp ?: return
-        val meta = lastMetadata ?: "{}"
-
+        val webp = lastWebp ?: run {
+            Toast.makeText(this, "Нет изображения для сохранения", Toast.LENGTH_SHORT).show()
+            return
+        }
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val api = RetrofitClient.create(settings)
@@ -216,15 +191,7 @@ class CameraActivity : AppCompatActivity() {
                     "file", "image.webp",
                     webp.toRequestBody("image/webp".toMediaTypeOrNull())
                 )
-                val idPart = tagId?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
-                val namePart = tagName.toRequestBody("text/plain".toMediaTypeOrNull())
-                val metaPart = meta.toRequestBody("application/json".toMediaTypeOrNull())
-
-                val responseBody = api.saveImage(
-                    settings.saveUrl, tagName, filePart, idPart, namePart, metaPart
-                )
-                responseBody.close()
-
+                api.saveImage(settings.saveUrl, tagName, tagId, filePart)
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@CameraActivity, "Сохранено", Toast.LENGTH_SHORT).show()
                     finish()
@@ -232,9 +199,7 @@ class CameraActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
-                        this@CameraActivity,
-                        "Save error: ${e.message}",
-                        Toast.LENGTH_LONG
+                        this@CameraActivity, "Save error: ${e.message}", Toast.LENGTH_LONG
                     ).show()
                 }
             }
