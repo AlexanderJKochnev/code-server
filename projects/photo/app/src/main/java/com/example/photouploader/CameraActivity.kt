@@ -164,20 +164,17 @@ class CameraActivity : AppCompatActivity() {
 
                 // --- диагностика: показать всё, что нужно ---
                 withContext(Dispatchers.Main) {
-                    val allHeaders = response.headers().names()
-                        .joinToString("\n") { "$it = ${response.headers()[it]}" }
-                    val msg = buildString {
-                        appendLine("bytes=${imageBytes.size}")
-                        appendLine("rawHeader='$rawHeader'")
-                        appendLine("parsed=$imageHash")
-                        appendLine("lastImageHash=$lastImageHash")
-                        appendLine("--- headers ---")
-                        append(allHeaders)
-                    }
-                    android.widget.Toast.makeText(
-                        this@CameraActivity, msg, android.widget.Toast.LENGTH_LONG
-                    ).show()
-                }
+    val allHeaders = response.headers().names()
+        .joinToString("\n") { "$it = ${response.headers()[it]}" }
+    Toast.makeText(this@CameraActivity,
+        "bytes=${imageBytes.size}", Toast.LENGTH_LONG).show()
+    Toast.makeText(this@CameraActivity,
+        "rawHeader='$rawHeader'", Toast.LENGTH_LONG).show()
+    Toast.makeText(this@CameraActivity,
+        "parsed=$imageHash, last=$lastImageHash", Toast.LENGTH_LONG).show()
+    Toast.makeText(this@CameraActivity,
+        "headers:\n$allHeaders", Toast.LENGTH_LONG).show()
+}
                 // --- конец диагностики ---
 
 
