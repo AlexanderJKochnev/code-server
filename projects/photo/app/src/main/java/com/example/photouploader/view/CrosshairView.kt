@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import kotlin.math.min
 
 class CrosshairView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -20,26 +19,30 @@ class CrosshairView @JvmOverloads constructor(
     }
 
     private val cells = 6
+    private val coverage = 0.84f // 84% экрана
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        // 85% от меньшей стороны экрана — квадратная область по центру
-        val side = min(width, height) * 0.85f
-        val left = (width - side) / 2f
-        val top = (height - side) / 2f
-        val right = left + side
-        val bottom = top + side
-        val step = side / cells
+        // 84% от ширины и высоты экрана, по центру
+        val gridWidth = width * coverage
+        val gridHeight = height * coverage
+        val left = (width - gridWidth) / 2f
+        val top = (height - gridHeight) / 2f
+        val right = left + gridWidth
+        val bottom = top + gridHeight
 
-        // Вертикальные линии
+        val stepX = gridWidth / cells
+        val stepY = gridHeight / cells
+
+        // Вертикальные линии (6+1)
         for (i in 0..cells) {
-            val x = left + i * step
+            val x = left + i * stepX
             canvas.drawLine(x, top, x, bottom, paint)
         }
-        // Горизонтальные линии
+        // Горизонтальные линии (6+1)
         for (i in 0..cells) {
-            val y = top + i * step
+            val y = top + i * stepY
             canvas.drawLine(left, y, right, y, paint)
         }
     }
