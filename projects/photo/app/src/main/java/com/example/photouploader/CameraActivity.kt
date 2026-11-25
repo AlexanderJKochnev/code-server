@@ -150,14 +150,13 @@ class CameraActivity : AppCompatActivity() {
                     settings.uploadUrl, tagName, tagId, filePart
                 )
 
-
-                val imageBytes = response.body()?.bytes()
-                    ?: throw IllegalStateException("Empty body")
-
                 val rawHeader = response.headers()["x-image-hash"]
                 val imageHash = rawHeader?.toIntOrNull()
 
                 // --- val imageHash = response.headers()["x-image-hash"]?.toIntOrNull()
+                val imageBytes = response.body()?.bytes()
+                    ?: throw IllegalStateException("Empty body")
+
                 response.body()?.close()
 
                 lastWebp = webp
