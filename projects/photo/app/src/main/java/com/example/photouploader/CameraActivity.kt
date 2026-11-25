@@ -150,13 +150,34 @@ class CameraActivity : AppCompatActivity() {
                     settings.uploadUrl, tagName, tagId, filePart
                 )
 
+
                 val imageBytes = response.body()?.bytes()
                     ?: throw IllegalStateException("Empty body")
+
                 val imageHash = response.headers()["x-image-hash"]?.toIntOrNull()
                 response.body()?.close()
 
                 lastWebp = webp
                 lastImageHash = imageHash
+
+                // --- диагностика: показать всё, что нужно ---
+                withContext(Dispatchers.Main) {
+                    val allHeaders = response.headers().names()
+                        .joinToString("\n") { "$it = ${response.headers()[it]}" }
+                    val msg = buildString {
+                        appendLine("bytes=${imageBytes.size}")
+                        appendLine("rawHeader='$rawHeader'")
+                        appendLine("parsed=$imageHash")
+                        appendLine("lastImageHash=$lastImageHash")
+                        appendLine("--- headers ---")
+                        append(allHeaders)
+                    }
+                    android.widget.Toast.makeText(
+                        this@CameraActivity, msg, android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+                // --- конец диагностики ---
+
 
                 val bitmapRaw = android.graphics.BitmapFactory
                     .decodeByteArray(imageBytes, 0, imageBytes.size)
