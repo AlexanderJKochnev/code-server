@@ -7,7 +7,9 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -40,6 +42,7 @@ class CameraActivity : AppCompatActivity() {
 
     private var cameraProvider: ProcessCameraProvider? = null
     private var lastWebp: ByteArray? = null
+    private var lastImageHash: Int? = null
 
     private val tagId: Int? by lazy { intent.getIntExtra("id", -1).takeIf { it >= 0 } }
     private val tagName: String by lazy { intent.getStringExtra("display_name") ?: "" }
@@ -86,12 +89,16 @@ class CameraActivity : AppCompatActivity() {
         future.addListener({
             val provider = future.get()
             cameraProvider = provider
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
+            val preview = Preview.Builder()
+                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                .build()
+                .also { it.setSurfaceProvider(previewView.surfaceProvider) }
+
             imageCapture = ImageCapture.Builder()
+                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build()
+
             try {
                 provider.unbindAll()
                 provider.bindToLifecycle(
@@ -110,7 +117,6 @@ class CameraActivity : AppCompatActivity() {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(results: ImageCapture.OutputFileResults) {
                     runOnUiThread {
-                        // Сразу отключаем камеру и показываем ожидание
                         cameraProvider?.unbindAll()
                         findViewById<View>(R.id.progressBar).visibility = View.VISIBLE
                         findViewById<View>(R.id.btnCapture).visibility = View.GONE
@@ -139,12 +145,17 @@ class CameraActivity : AppCompatActivity() {
                     "file", "image.webp",
                     webp.toRequestBody("image/webp".toMediaTypeOrNull())
                 )
-                val responseBody = api.uploadImage(
+
+                val response = api.uploadImage(
                     settings.uploadUrl, tagName, tagId, filePart
                 )
-                val imageBytes = responseBody.bytes()
-                responseBody.close()
+                val imageBytes = response.body()?.bytes()
+                    ?: throw IllegalStateException("Empty body")
+                val imageHash = response.headers()["X-Image-Hash"]?.toIntOrNull()
+                response.body()?.close()
+
                 lastWebp = webp
+                lastImageHash = imageHash
 
                 val bitmapRaw = android.graphics.BitmapFactory
                     .decodeByteArray(imageBytes, 0, imageBytes.size)
@@ -180,27 +191,33 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun saveApprovedImage() {
-        val webp = lastWebp ?: return
+        val hash = lastImageHash
+        if (hash == null) {
+            Toast.makeText(this, "Нет хэша изображения", Toast.LENGTH_SHORT).show()
+            return
+        }
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val api = RetrofitClient.create(settings)
-                val filePart = MultipartBody.Part.createFormData(
-                    "file", "image.webp",
-                    webp.toRequestBody("image/webp".toMediaTypeOrNull())
-                )
-                api.saveImage(settings.saveUrl, tagName, tagId, filePart)
+                val response = api.saveImage(settings.saveUrl, hash)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@CameraActivity, "Сохранено", Toast.LENGTH_SHORT).show()
-                    finish()
+                    showResultDialog(response.result, response.detail)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        this@CameraActivity, "Save error: ${e.message}", Toast.LENGTH_LONG
-                    ).show()
+                    showResultDialog(false, "Ошибка сети: ${e.message}")
                 }
             }
         }
+    }
+
+    private fun showResultDialog(result: Boolean, detail: String) {
+        AlertDialog.Builder(this)
+            .setTitle(if (result) "Успешно" else "Ошибка")
+            .setMessage(detail)
+            .setPositiveButton("Ok") { _, _ -> finish() }
+            .setCancelable(false)
+            .show()
     }
 
     override fun onDestroy() {
