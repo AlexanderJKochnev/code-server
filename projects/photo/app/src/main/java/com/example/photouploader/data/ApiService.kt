@@ -35,6 +35,6 @@ interface ApiService {
     @POST
     suspend fun saveImage(
         @Url url: String,
-        @Query("image_hash") imageHash: Int
+        @Query("image_hash") imageHash: String
     ): SaveResponse
 }

@@ -210,7 +210,7 @@ class CameraActivity : AppCompatActivity() {
 
     private fun saveApprovedImage() {
         val hash = lastImageHash
-        if (hash == null) {
+        if (hash.isNullOrBlank()) {
             Toast.makeText(this, "Нет хэша изображения", Toast.LENGTH_SHORT).show()
             return
         }
