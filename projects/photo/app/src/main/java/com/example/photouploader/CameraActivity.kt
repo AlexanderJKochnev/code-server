@@ -77,6 +77,7 @@ class CameraActivity : AppCompatActivity() {
                         "file", "image.webp",
                         webp.toRequestBody("image/webp".toMediaTypeOrNull())
                     )
+                    // Новая сигнатура: url, tag, id, file
                     api.saveImage(settings.saveUrl, tagName, tagId, filePart)
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@CameraActivity, "Сохранено", Toast.LENGTH_SHORT).show()
