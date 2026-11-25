@@ -150,20 +150,6 @@ class CameraActivity : AppCompatActivity() {
                     settings.uploadUrl, tagName, tagId, filePart
                 )
 
-
-                val response = api.uploadImage(settings.uploadUrl, tagName, tagId, filePart)
-
-                android.util.Log.d("UPLOAD", "all headers: ${response.headers()}")
-                android.util.Log.d("UPLOAD", "X-Image-Hash = '${response.headers()["X-Image-Hash"]}'")
-
-                val imageBytes = response.body()?.bytes() ?: throw IllegalStateException("Empty body")
-                val imageHash = response.headers()["X-Image-Hash"]?.toIntOrNull()
-                android.util.Log.d("UPLOAD", "parsed hash = $imageHash")
-
-                lastWebp = webp
-                lastImageHash = imageHash
-
-
                 val imageBytes = response.body()?.bytes()
                     ?: throw IllegalStateException("Empty body")
                 val imageHash = response.headers()["X-Image-Hash"]?.toIntOrNull()
@@ -211,8 +197,6 @@ class CameraActivity : AppCompatActivity() {
             Toast.makeText(this, "Нет хэша изображения", Toast.LENGTH_SHORT).show()
             return
         }
-
-        android.util.Log.d("UPLOAD", "saveApprovedImage: lastImageHash=$lastImageHash")
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
