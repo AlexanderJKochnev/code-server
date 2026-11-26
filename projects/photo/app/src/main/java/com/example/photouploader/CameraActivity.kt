@@ -44,7 +44,7 @@ class CameraActivity : AppCompatActivity() {
     private var lastWebp: ByteArray? = null
     private var lastImageHash: String? = null
 
-    private val tagId: Int? by lazy { intent.getIntExtra("id", -1).takeIf { it >= 0 } }
+    private val tagId: String? by lazy {intent.getStringExtra("id")?.takeIf { it.isNotBlank() }}
     private val tagName: String by lazy { intent.getStringExtra("display_name") ?: "" }
 
     override fun onCreate(savedInstanceState: Bundle?) {

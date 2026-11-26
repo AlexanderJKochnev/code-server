@@ -28,7 +28,7 @@ interface ApiService {
     suspend fun uploadImage(
         @Url url: String,
         @Query("tag") tag: String,
-        @Query("id") id: Int?,
+        @Query("id") id: String?,
         @Part file: MultipartBody.Part
     ): retrofit2.Response<ResponseBody>
 

@@ -76,7 +76,7 @@ class SearchActivity : AppCompatActivity() {
             if (displayName.isBlank()) return@setOnClickListener
 
             val intent = Intent(this, CameraActivity::class.java).apply {
-                putExtra("id", selected?.id)
+                putExtra("id", selected?.id?.toString()
                 putExtra("display_name", displayName)
             }
             startActivity(intent)
