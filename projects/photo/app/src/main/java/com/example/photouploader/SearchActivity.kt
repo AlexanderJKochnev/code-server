@@ -79,6 +79,13 @@ class SearchActivity : AppCompatActivity() {
                 putExtra("id", selected?.id?.toString())
                 putExtra("display_name", displayName)
             }
+            // -------------
+            Toast.makeText(
+                this,
+                "putExtra: id='${selected?.id?.toString()}', name='$displayName'",
+                Toast.LENGTH_LONG
+            ).show()
+            // -------------
             startActivity(intent)
         }
     }
