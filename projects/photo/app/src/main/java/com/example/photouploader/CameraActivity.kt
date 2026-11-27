@@ -103,7 +103,7 @@ class CameraActivity : AppCompatActivity() {
                 .also { it.setSurfaceProvider(previewView.surfaceProvider) }
 
             imageCapture = ImageCapture.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                // --- .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                 .setTargetRotation(previewView.display.rotation)
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build()
