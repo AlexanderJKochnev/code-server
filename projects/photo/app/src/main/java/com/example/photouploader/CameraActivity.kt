@@ -98,11 +98,13 @@ class CameraActivity : AppCompatActivity() {
             val provider = future.get()
             cameraProvider = provider
             val preview = Preview.Builder()
+                .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .build()
                 .also { it.setSurfaceProvider(previewView.surfaceProvider) }
                 // -- .setTargetAspectRatio(AspectRatio.RATIO_4_3)
 
             imageCapture = ImageCapture.Builder()
+                .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .setTargetRotation(previewView.display.rotation)
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build()
