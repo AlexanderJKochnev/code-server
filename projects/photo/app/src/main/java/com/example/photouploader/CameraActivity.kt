@@ -50,15 +50,6 @@ class CameraActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
-        // ---TEST
-        android.os.Handler(android.os.Looper.getMainLooper()).post {
-            Toast.makeText(
-                this,
-                "onCreate: tagId='$tagId', tagName='$tagName'",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-        // ---TEST
         previewView = findViewById(R.id.previewView)
         settings = SettingsManager(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -157,13 +148,13 @@ class CameraActivity : AppCompatActivity() {
                     webp.toRequestBody("image/webp".toMediaTypeOrNull())
                 )
                 // ---TEST
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        this@CameraActivity,
-                        "uploadPhoto: tagId='$tagId', tagName='$tagName'",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                // withContext(Dispatchers.Main) {
+                //     Toast.makeText(
+                //         this@CameraActivity,
+                //         "uploadPhoto: tagId='$tagId', tagName='$tagName'",
+                //         Toast.LENGTH_LONG
+                //     ).show()
+                // }
                 // ---TEST
                 val response = api.uploadImage(
                     settings.uploadUrl, tagName, tagId, filePart
@@ -178,20 +169,20 @@ class CameraActivity : AppCompatActivity() {
                 lastWebp = webp
                 lastImageHash = rawHeader?.trim()
 
-                // --- диагностика: показать всё, что нужно ---
-                withContext(Dispatchers.Main) {
-                    val allHeaders = response.headers().names()
-                        .joinToString("\n") { "$it = ${response.headers()[it]}" }
-                    Toast.makeText(this@CameraActivity,
-                        "bytes=${imageBytes.size}", Toast.LENGTH_LONG).show()
-                    Toast.makeText(this@CameraActivity,
-                        "rawHeader='$rawHeader'", Toast.LENGTH_LONG).show()
-                    Toast.makeText(this@CameraActivity,
-                        "last=$lastImageHash", Toast.LENGTH_LONG).show()
-                    Toast.makeText(this@CameraActivity,
-                        "headers:\n$allHeaders", Toast.LENGTH_LONG).show()
-                }
-                // --- конец диагностики ---
+                // ---TEST
+                // withContext(Dispatchers.Main) {
+                //     val allHeaders = response.headers().names()
+                //         .joinToString("\n") { "$it = ${response.headers()[it]}" }
+                //     Toast.makeText(this@CameraActivity,
+                //         "bytes=${imageBytes.size}", Toast.LENGTH_LONG).show()
+                //     Toast.makeText(this@CameraActivity,
+                //         "rawHeader='$rawHeader'", Toast.LENGTH_LONG).show()
+                //     Toast.makeText(this@CameraActivity,
+                //         "last=$lastImageHash", Toast.LENGTH_LONG).show()
+                //     Toast.makeText(this@CameraActivity,
+                //         "headers:\n$allHeaders", Toast.LENGTH_LONG).show()
+                // }
+                // ---TEST
 
 
                 val bitmapRaw = android.graphics.BitmapFactory

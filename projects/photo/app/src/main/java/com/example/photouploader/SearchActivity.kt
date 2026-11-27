@@ -48,13 +48,6 @@ class SearchActivity : AppCompatActivity() {
 
         adapter = ResultsAdapter { item ->
             selected = item
-            // ----TEST
-            Toast.makeText(
-                this,
-                "item click: id=${item.id}, name='${item.display_name}'",
-                Toast.LENGTH_LONG
-            ).show()
-            // ----TEST
             suppressTextWatcher = true
             etQuery.setText(item.display_name)
             etQuery.setSelection(etQuery.text.length)
@@ -86,13 +79,6 @@ class SearchActivity : AppCompatActivity() {
             val displayName = selected?.display_name
                 ?: etQuery.text.toString().trim()
             if (displayName.isBlank()) return@setOnClickListener
-            // ---TEST
-            Toast.makeText(
-                this,
-                "putExtra: id='${selected?.id?.toString()}', name='$displayName'",
-                Toast.LENGTH_LONG
-            ).show()
-            // ---TEST
             val intent = Intent(this, CameraActivity::class.java).apply {
                 putExtra("id", selected?.id?.toString())
                 putExtra("display_name", displayName)
