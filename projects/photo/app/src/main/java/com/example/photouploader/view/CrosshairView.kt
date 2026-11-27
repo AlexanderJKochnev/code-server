@@ -18,7 +18,7 @@ class CrosshairView @JvmOverloads constructor(
         alpha = 180
     }
 
-    private val cells = 6
+    private val cells = 11
     private val coverage = 0.84f // 84% экрана
 
     override fun onDraw(canvas: Canvas) {
