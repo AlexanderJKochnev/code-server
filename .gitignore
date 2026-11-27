@@ -1,4 +1,5 @@
 .env
 **/.gradle
-photo-uploader-release.jks
+projects/photo/photo-uploader-release.jks
 keystore.properties
+*.jks

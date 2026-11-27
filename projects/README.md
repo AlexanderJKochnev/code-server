@@ -16,17 +16,6 @@ keytool -genkey -v -keystore ~/photo-uploader-release.jks \
   -alias photo-uploader
 
 
-
-
-
-
-
-
-
-
-
-
-
 ## сборка production release
 ./gradlew assembleRelease
 

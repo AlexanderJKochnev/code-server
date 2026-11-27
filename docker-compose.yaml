@@ -13,6 +13,7 @@ services:
       - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/gradle-cache:/home/coder/.gradle
       - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/android-sdk:/home/coder/Android/Sdk
       - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/code-config:/home/coder/.local/share/code-server
+      - ${BIND_VOLUMES}/${COMPOSE_PROJECT_NAME}/keystore.properties:/home/coder/keystore.properties
     networks:
       nginx_gateway_shared_network:
 
