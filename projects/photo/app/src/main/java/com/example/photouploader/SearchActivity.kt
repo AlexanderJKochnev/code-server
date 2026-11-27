@@ -46,6 +46,13 @@ class SearchActivity : AppCompatActivity() {
 
         adapter = ResultsAdapter { item ->
             selected = item
+            // ----TEST
+            Toast.makeText(
+                this,
+                "item click: id=${item.id}, name='${item.display_name}'",
+                Toast.LENGTH_LONG
+            ).show()
+            // ----TEST
             etQuery.setText(item.display_name)
             etQuery.setSelection(etQuery.text.length)
         }
@@ -71,6 +78,15 @@ class SearchActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnNext).setOnClickListener {
+            // ----TEST
+            Toast.makeText(
+                this,
+                "putExtra: id='${selected?.id?.toString()}', name='$displayName'",
+                Toast.LENGTH_LONG
+            ).show()
+            // ----TEST
+            startActivity(intent)
+
             val displayName = selected?.display_name
                 ?: etQuery.text.toString().trim()
             if (displayName.isBlank()) return@setOnClickListener
@@ -79,14 +95,6 @@ class SearchActivity : AppCompatActivity() {
                 putExtra("id", selected?.id?.toString())
                 putExtra("display_name", displayName)
             }
-            // -------------
-            Toast.makeText(
-                this,
-                "putExtra: id='${selected?.id?.toString()}', name='$displayName'",
-                Toast.LENGTH_LONG
-            ).show()
-            // -------------
-            startActivity(intent)
         }
     }
 

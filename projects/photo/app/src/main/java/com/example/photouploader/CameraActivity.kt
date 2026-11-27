@@ -50,7 +50,15 @@ class CameraActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
-
+        // ---TEST
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            Toast.makeText(
+                this,
+                "onCreate: tagId='$tagId', tagName='$tagName'",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        // ---TEST
         previewView = findViewById(R.id.previewView)
         settings = SettingsManager(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -145,7 +153,15 @@ class CameraActivity : AppCompatActivity() {
                     "file", "image.webp",
                     webp.toRequestBody("image/webp".toMediaTypeOrNull())
                 )
-
+                // ---TEST
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "uploadPhoto: tagId='$tagId', tagName='$tagName'",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                // ---TEST
                 val response = api.uploadImage(
                     settings.uploadUrl, tagName, tagId, filePart
                 )
