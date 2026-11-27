@@ -79,6 +79,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnNext).setOnClickListener {
+            val displayName = selected?.display_name
+                ?: etQuery.text.toString().trim()
+            if (displayName.isBlank()) return@setOnClickListener
             // ----TEST
             Toast.makeText(
                 this,
@@ -86,16 +89,11 @@ class SearchActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
             // ----TEST
-            startActivity(intent)
-
-            val displayName = selected?.display_name
-                ?: etQuery.text.toString().trim()
-            if (displayName.isBlank()) return@setOnClickListener
-
             val intent = Intent(this, CameraActivity::class.java).apply {
                 putExtra("id", selected?.id?.toString())
                 putExtra("display_name", displayName)
             }
+            startActivity(intent)
         }
     }
 
