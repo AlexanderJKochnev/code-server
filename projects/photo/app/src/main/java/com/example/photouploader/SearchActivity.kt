@@ -36,6 +36,7 @@ class SearchActivity : AppCompatActivity() {
     private val queryFlow = MutableStateFlow("")
     private var selected: SearchResult? = null
     private var searchJob: Job? = null
+    private var suppressTextWatcher = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,12 +57,14 @@ class SearchActivity : AppCompatActivity() {
             // ----TEST
             etQuery.setText(item.display_name)
             etQuery.setSelection(etQuery.text.length)
+            suppressTextWatcher = false
         }
         rvResults.layoutManager = LinearLayoutManager(this)
         rvResults.adapter = adapter
 
         etQuery.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
+                if (suppressTextWatcher) return
                 val text = s?.toString()?.trim() ?: ""
                 selected = null
                 queryFlow.value = text
@@ -82,13 +85,13 @@ class SearchActivity : AppCompatActivity() {
             val displayName = selected?.display_name
                 ?: etQuery.text.toString().trim()
             if (displayName.isBlank()) return@setOnClickListener
-            // ----TEST
+            // ---TEST
             Toast.makeText(
                 this,
                 "putExtra: id='${selected?.id?.toString()}', name='$displayName'",
                 Toast.LENGTH_LONG
             ).show()
-            // ----TEST
+            // ---TEST
             val intent = Intent(this, CameraActivity::class.java).apply {
                 putExtra("id", selected?.id?.toString())
                 putExtra("display_name", displayName)
