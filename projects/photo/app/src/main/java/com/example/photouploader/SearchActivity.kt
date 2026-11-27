@@ -55,6 +55,7 @@ class SearchActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
             // ----TEST
+            suppressTextWatcher = true
             etQuery.setText(item.display_name)
             etQuery.setSelection(etQuery.text.length)
             suppressTextWatcher = false
